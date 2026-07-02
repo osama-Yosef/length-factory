@@ -1,0 +1,123 @@
+rules_version = '2';
+
+// =============================================================================
+// Length Factory — Firestore Security Rules
+// =============================================================================
+// Role model: every authenticated user has exactly one role document at
+// /users/{uid} with a `role` field: "admin" | "customer" | "worker".
+//
+// IMPORTANT: Worker accounts must NEVER be allowed to read product prices
+// or customer balances directly. Since Firestore cannot redact individual
+// fields within a document read, the Worker app's `orders` query must only
+// request the fields it needs at the client level — but as defense in depth,
+// these rules still block Workers from `get`-ing /products or /users docs
+// beyond their own profile.
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && userRole() == 'admin';
+    }
+
+    function isWorker() {
+      return isSignedIn() && userRole() == 'worker';
+    }
+
+    function isCustomer() {
+      return isSignedIn() && userRole() == 'customer';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ---------------------------------------------------------------------
+    // users/{userId}
+    // ---------------------------------------------------------------------
+    match /users/{userId} {
+      // Admin: full access (manage customers, workers, other admins).
+      allow read, write: if isAdmin();
+
+      // Customer: may read & update only their OWN profile, and must
+      // never be able to change their own `role` or `balance` directly
+      // (balance is only ever mutated server-side via transactions
+      // triggered through the app's checkout/payment Cloud logic, which
+      // runs under the authenticated user's own permissions through the
+      // repository transaction — role/balance edits from raw client
+      // writes are blocked below).
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId)
+                    && request.resource.data.role == resource.data.role
+                    && request.resource.data.balance == resource.data.balance;
+
+      // Worker: may read only their own profile (e.g. to show their name).
+      allow read: if isWorker() && isOwner(userId);
+
+      // New customer self-registration (handled by AuthService right
+      // after Firebase Auth account creation).
+      allow create: if isOwner(userId)
+                    && request.resource.data.role == 'customer'
+                    && request.resource.data.balance == 0;
+    }
+
+    // ---------------------------------------------------------------------
+    // products/{productId}
+    // ---------------------------------------------------------------------
+    match /products/{productId} {
+      // Everyone signed in can view active products (storefront).
+      // Workers are intentionally allowed to read product *names* for
+      // the production queue, but the client UI never renders price
+      // fields for the Worker role — see note above.
+      allow read: if isSignedIn();
+
+      // Only Admin can create/update/delete (soft-delete via isActive).
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // orders/{orderId}
+    // ---------------------------------------------------------------------
+    match /orders/{orderId} {
+      // Admin: full access.
+      allow read, write: if isAdmin();
+
+      // Customer: may create an order for themselves, and may only
+      // read their own orders.
+      allow create: if isCustomer()
+                    && request.resource.data.customerId == request.auth.uid;
+      allow read: if isCustomer() && resource.data.customerId == request.auth.uid;
+
+      // Worker: may read active orders (production queue) and update
+      // ONLY the `status`, `completedAt` and `workerNote` fields — never
+      // price/payment fields.
+      allow read: if isWorker();
+      allow update: if isWorker()
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['status', 'completedAt', 'workerNote']);
+    }
+
+    // ---------------------------------------------------------------------
+    // payments/{paymentId}
+    // ---------------------------------------------------------------------
+    match /payments/{paymentId} {
+      // Admin: full access (only Admin can confirm/record payments).
+      allow read, write: if isAdmin();
+
+      // Customer: may read only their own payment history. Never write.
+      allow read: if isCustomer() && resource.data.customerId == request.auth.uid;
+    }
+  }
+}

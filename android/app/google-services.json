@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "734274838313",
+    "project_id": "length-factory",
+    "storage_bucket": "length-factory.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734274838313:android:322049ae033cb82a1aa138",
+        "android_client_info": {
+          "package_name": "com.example.length_factory"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "734274838313-141iqhlahoq3p3o37rllkt16cpnqjulf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrs1jXJ-rHSvK8SfJSmasBgkJVf_JlLwc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "734274838313-141iqhlahoq3p3o37rllkt16cpnqjulf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "734274838313-5na246sr24v94e4hso3h8dro741hk7na.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.lengthFactory"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
