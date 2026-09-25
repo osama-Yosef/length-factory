@@ -127,27 +127,29 @@ class _StaffTile extends StatelessWidget {
               ),
             ],
           ),
-          subtitle: Text(
-            '${user.email}\n${user.phone}',
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${user.email}\n${user.phone}',
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                user.isActive ? '● نشط' : '● موقوف',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: user.isActive ? AppColors.success : AppColors.error,
+                ),
+              ),
+            ],
           ),
           isThreeLine: true,
+          // ListTile caps `trailing` at 56px height — keep only the switch here.
           trailing: isMe
               ? null
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Switch(value: user.isActive, onChanged: (v) => _toggle(context, v)),
-                    Text(
-                      user.isActive ? 'نشط' : 'موقوف',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: user.isActive ? AppColors.success : AppColors.error,
-                      ),
-                    ),
-                  ],
-                ),
+              : Switch(value: user.isActive, onChanged: (v) => _toggle(context, v)),
         ),
       ),
     );
