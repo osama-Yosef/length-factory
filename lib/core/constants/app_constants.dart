@@ -62,7 +62,7 @@ class PaymentStatus {
 class CloudinaryConfig {
   CloudinaryConfig._();
 
-  static const String cloudName = 'YOUR_CLOUD_NAME';
+  static const String cloudName = 'dytgdp642';
   static const String uploadPreset = 'length_factory';
   static const String rootFolder = 'length_factory';
   static const String baseUrl = 'https://api.cloudinary.com/v1_1';
