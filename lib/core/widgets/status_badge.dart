@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/constants/app_constants.dart';
 
+import '../theme/app_colors.dart';
+import '../utils/format_utils.dart';
+
+/// Colored pill for an order status or a payment status.
 class StatusBadge extends StatelessWidget {
   final String status;
   final bool isPayment;
@@ -10,44 +12,53 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isPayment ? _paymentColor(status) : AppColors.forOrderStatus(status);
-    final label = isPayment ? _paymentLabel(status) : _orderLabel(status);
+    final fg = isPayment ? AppColors.forPaymentStatus(status) : AppColors.forOrderStatus(status);
+    final bg = isPayment
+        ? AppColors.softForPaymentStatus(status)
+        : AppColors.softForOrderStatus(status);
+    final label = isPayment ? FormatUtils.paymentStatus(status) : FormatUtils.orderStatus(status);
 
+    return AppBadge(label: label, foreground: fg, background: bg);
+  }
+}
+
+/// Generic pill badge.
+class AppBadge extends StatelessWidget {
+  final String label;
+  final Color foreground;
+  final Color background;
+  final IconData? icon;
+
+  const AppBadge({
+    super.key,
+    required this.label,
+    required this.foreground,
+    required this.background,
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: background,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
+        border: Border.all(color: foreground.withValues(alpha: 0.45)),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 13, color: foreground),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: TextStyle(color: foreground, fontSize: 12, fontWeight: FontWeight.w800),
+          ),
+        ],
       ),
     );
   }
-
-  String _orderLabel(String s) => switch (s) {
-        OrderStatus.pending => 'قيد الانتظار',
-        OrderStatus.preparing => 'جاري التحضير',
-        OrderStatus.completed => 'مكتمل',
-        OrderStatus.cancelled => 'ملغي',
-        _ => s,
-      };
-
-  Color _paymentColor(String s) => switch (s) {
-        PaymentStatus.paid => AppColors.success,
-        PaymentStatus.partiallyPaid => AppColors.warning,
-        _ => AppColors.error,
-      };
-
-  String _paymentLabel(String s) => switch (s) {
-        PaymentStatus.paid => 'مدفوع',
-        PaymentStatus.partiallyPaid => 'مدفوع جزئياً',
-        _ => 'غير مدفوع',
-      };
 }

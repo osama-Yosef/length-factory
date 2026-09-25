@@ -25,12 +25,10 @@ class UserRole {
   static const String worker = 'worker';
 
   static const List<String> all = [admin, customer, worker];
+  static const List<String> staff = [admin, worker];
 }
 
 /// Order lifecycle status.
-///
-/// NOTE: Order of declaration matters for the Kanban-style admin
-/// board and for the worker production queue filtering.
 class OrderStatus {
   OrderStatus._();
 
@@ -57,31 +55,41 @@ class PaymentStatus {
   static const List<String> all = [unpaid, partiallyPaid, paid];
 }
 
-/// Shared Preferences keys.
-class PrefsKeys {
-  PrefsKeys._();
+/// Cloudinary unsigned-upload configuration (used by the Dio client).
+///
+/// Create an *unsigned* upload preset named [uploadPreset] from the
+/// Cloudinary console (Settings → Upload) and put your cloud name here.
+class CloudinaryConfig {
+  CloudinaryConfig._();
 
-  static const String themeMode = 'theme_mode';
-  static const String cachedRole = 'cached_role';
-  static const String fcmToken = 'fcm_token';
+  static const String cloudName = 'YOUR_CLOUD_NAME';
+  static const String uploadPreset = 'length_factory';
+  static const String rootFolder = 'length_factory';
+  static const String baseUrl = 'https://api.cloudinary.com/v1_1';
 }
 
-/// App-level constants (paddings, durations, limits).
+/// App-level constants (durations, limits).
 class AppConstants {
   AppConstants._();
 
   static const String appName = 'Length Factory';
 
-  // Pagination
-  static const int productsPageSize = 20;
-  static const int ordersPageSize = 25;
-  static const int customersPageSize = 25;
-
   // Animation
   static const Duration shortAnimation = Duration(milliseconds: 200);
   static const Duration mediumAnimation = Duration(milliseconds: 400);
 
+  // Network
+  static const Duration connectTimeout = Duration(seconds: 20);
+  static const Duration receiveTimeout = Duration(seconds: 60);
+
   // Validation
   static const int minPasswordLength = 6;
   static const int phoneLength = 11; // Egyptian mobile numbers (e.g. 01XXXXXXXXX)
+
+  // Inventory
+  static const int lowStockThreshold = 5;
+
+  /// How long to wait for a freshly-created auth account's Firestore
+  /// profile before treating it as missing.
+  static const Duration profileLoadTimeout = Duration(seconds: 8);
 }

@@ -1,64 +1,102 @@
 import 'package:flutter/material.dart';
 
-/// Brand color palette: "Dark Blue & Orange" industrial factory theme.
+/// Light, high-contrast palette.
 ///
-/// Centralizing raw color values here (instead of scattering
-/// `Color(0xFF...)` across widgets) makes re-theming trivial and keeps
-/// [AppTheme] readable.
+/// Backgrounds are light, but every foreground (text, icons, borders,
+/// status labels) is dark enough to stay clearly readable (WCAG AA+).
 class AppColors {
   AppColors._();
 
-  // Primary - Dark Blue
-  static const Color primaryDark = Color(0xFF0B1F3A);
-  static const Color primary = Color(0xFF13315C);
-  static const Color primaryLight = Color(0xFF1F4E8C);
+  // Brand — Blue
+  static const Color primary = Color(0xFF1D4ED8); // blue-700
+  static const Color primaryDark = Color(0xFF1E3A8A); // blue-900
+  static const Color primaryLight = Color(0xFF3B82F6); // blue-500
+  static const Color primarySoft = Color(0xFFEFF4FF); // tinted background
 
-  // Secondary - Orange (industrial / spark accent)
-  static const Color secondary = Color(0xFFF77F00);
-  static const Color secondaryLight = Color(0xFFFFA94D);
-  static const Color secondaryDark = Color(0xFFD66600);
+  // Accent — Orange (industrial)
+  static const Color secondary = Color(0xFFEA580C); // orange-600
+  static const Color secondaryDark = Color(0xFFC2410C); // orange-700
+  static const Color secondarySoft = Color(0xFFFFF1E6);
 
-  // Neutrals - Light theme
-  static const Color lightBackground = Color(0xFFF5F7FA);
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightCard = Color(0xFFFFFFFF);
+  // Surfaces
+  static const Color background = Color(0xFFF6F8FB);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceMuted = Color(0xFFF1F5F9);
 
-  // Neutrals - Dark theme
-  static const Color darkBackground = Color(0xFF0A0E17);
-  static const Color darkSurface = Color(0xFF131A28);
-  static const Color darkCard = Color(0xFF1A2235);
-
-  // Status colors
-  static const Color success = Color(0xFF2ECC71);
-  static const Color warning = Color(0xFFF1C40F);
-  static const Color error = Color(0xFFE74C3C);
-  static const Color info = Color(0xFF3498DB);
-
-  // Order status colors
-  static const Color statusPending = Color(0xFFF1C40F);
-  static const Color statusPreparing = Color(0xFF3498DB);
-  static const Color statusCompleted = Color(0xFF2ECC71);
-  static const Color statusCancelled = Color(0xFFE74C3C);
+  // Borders
+  static const Color border = Color(0xFFD5DCE6);
+  static const Color borderStrong = Color(0xFFB6C2D2);
 
   // Text
-  static const Color textPrimaryLight = Color(0xFF1A1F2B);
-  static const Color textSecondaryLight = Color(0xFF6B7280);
-  static const Color textPrimaryDark = Color(0xFFF2F4F8);
-  static const Color textSecondaryDark = Color(0xFF9CA3AF);
+  static const Color textPrimary = Color(0xFF0F172A); // slate-900
+  static const Color textSecondary = Color(0xFF475569); // slate-600
+  static const Color textMuted = Color(0xFF64748B); // slate-500
 
-  /// Returns the color associated with a given order status string.
+  // Semantic (dark enough for text on white)
+  static const Color success = Color(0xFF15803D);
+  static const Color successSoft = Color(0xFFDCFCE7);
+  static const Color warning = Color(0xFFB45309);
+  static const Color warningSoft = Color(0xFFFEF3C7);
+  static const Color error = Color(0xFFB91C1C);
+  static const Color errorSoft = Color(0xFFFEE2E2);
+  static const Color info = Color(0xFF0369A1);
+  static const Color infoSoft = Color(0xFFE0F2FE);
+
+  // Order status
+  static const Color statusPending = warning;
+  static const Color statusPreparing = primary;
+  static const Color statusCompleted = success;
+  static const Color statusCancelled = error;
+
+  /// Foreground color for an order status.
   static Color forOrderStatus(String status) {
     switch (status) {
-      case 'pending':
-        return statusPending;
       case 'preparing':
         return statusPreparing;
       case 'completed':
         return statusCompleted;
       case 'cancelled':
         return statusCancelled;
+      case 'pending':
       default:
         return statusPending;
+    }
+  }
+
+  /// Soft background color for an order status badge.
+  static Color softForOrderStatus(String status) {
+    switch (status) {
+      case 'preparing':
+        return primarySoft;
+      case 'completed':
+        return successSoft;
+      case 'cancelled':
+        return errorSoft;
+      case 'pending':
+      default:
+        return warningSoft;
+    }
+  }
+
+  static Color forPaymentStatus(String status) {
+    switch (status) {
+      case 'paid':
+        return success;
+      case 'partially_paid':
+        return warning;
+      default:
+        return error;
+    }
+  }
+
+  static Color softForPaymentStatus(String status) {
+    switch (status) {
+      case 'paid':
+        return successSoft;
+      case 'partially_paid':
+        return warningSoft;
+      default:
+        return errorSoft;
     }
   }
 }

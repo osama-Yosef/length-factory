@@ -59,9 +59,18 @@ service cloud.firestore {
       // repository transaction — role/balance edits from raw client
       // writes are blocked below).
       allow read: if isOwner(userId);
+
+      // (a) Profile edit: name / phone only — never role, balance or status.
       allow update: if isOwner(userId)
-                    && request.resource.data.role == resource.data.role
-                    && request.resource.data.balance == resource.data.balance;
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['name', 'phone']);
+
+      // (b) Checkout transaction: a customer's balance may only INCREASE
+      // (the order total is added). Decreases happen via Admin payments.
+      allow update: if isCustomer() && isOwner(userId)
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['balance'])
+                    && request.resource.data.balance > resource.data.balance;
 
       // Worker: may read only their own profile (e.g. to show their name).
       allow read: if isWorker() && isOwner(userId);
@@ -85,6 +94,14 @@ service cloud.firestore {
 
       // Only Admin can create/update/delete (soft-delete via isActive).
       allow create, update, delete: if isAdmin();
+
+      // Checkout transaction: a customer may only DECREASE `quantity`
+      // (never below zero) and may not touch any other field.
+      allow update: if isCustomer()
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['quantity'])
+                    && request.resource.data.quantity < resource.data.quantity
+                    && request.resource.data.quantity >= 0;
     }
 
     // ---------------------------------------------------------------------
@@ -97,7 +114,9 @@ service cloud.firestore {
       // Customer: may create an order for themselves, and may only
       // read their own orders.
       allow create: if isCustomer()
-                    && request.resource.data.customerId == request.auth.uid;
+                    && request.resource.data.customerId == request.auth.uid
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.paymentStatus == 'unpaid';
       allow read: if isCustomer() && resource.data.customerId == request.auth.uid;
 
       // Worker: may read active orders (production queue) and update

@@ -1,130 +1,85 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import '../../presentation/auth/providers/auth_provider.dart';
-import '../../presentation/auth/screens/login_screen.dart';
-import '../../presentation/auth/screens/register_screen.dart';
-import '../../presentation/shared/screens/splash_screen.dart';
-import '../../presentation/admin/screens/admin_shell.dart';
-import '../../presentation/customer/screens/customer_shell.dart';
-import '../../presentation/worker/screens/worker_shell.dart';
 
-/// Centralized route names — avoids "magic string" route paths
-/// scattered across the codebase.
-class AppRoutes {
-  AppRoutes._();
-  static const splash = '/';
-  static const login = '/login';
-  static const register = '/register';
-  static const adminHome = '/admin';
-  static const customerHome = '/customer';
-  static const workerHome = '/worker';
-}
+import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/auth/presentation/cubit/auth_state.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/shell/presentation/admin_shell.dart';
+import '../../features/shell/presentation/customer_shell.dart';
+import '../../features/shell/presentation/worker_shell.dart';
+import 'app_routes.dart';
 
-/// Builds the app's [GoRouter] with a centralized `redirect` that enforces
-/// role-based access: an unauthenticated user can only see auth screens,
-/// and an authenticated user is bounced to *their* role's shell even if
-/// they manually navigate to another role's path.
-GoRouter buildRouter(AuthProvider authProvider) {
-  return GoRouter(
-    initialLocation: AppRoutes.splash,
-    refreshListenable: authProvider,
-    debugLogDiagnostics: false,
-    routes: [
-      GoRoute(
-        path: AppRoutes.splash,
-        builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.login,
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.register,
-        builder: (context, state) => const RegisterScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.adminHome,
-        builder: (context, state) => const AdminShell(),
-      ),
-      GoRoute(
-        path: AppRoutes.customerHome,
-        builder: (context, state) => const CustomerShell(),
-      ),
-      GoRoute(
-        path: AppRoutes.workerHome,
-        builder: (context, state) => const WorkerShell(),
-      ),
-    ],
-    redirect: (context, state) {
-      final status = authProvider.status;
-      final loc = state.matchedLocation;
+export 'app_routes.dart';
 
-      // Still resolving Firebase auth state -> stay on splash.
-      if (status == AuthStatus.unknown) {
-        return loc == AppRoutes.splash ? null : AppRoutes.splash;
-      }
+/// Turns a Cubit stream into a [Listenable] for GoRouter's refresh.
+class GoRouterRefreshStream extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _sub;
 
-      final isAuthRoute = loc == AppRoutes.login || loc == AppRoutes.register;
-
-      if (status == AuthStatus.unauthenticated) {
-        return isAuthRoute ? null : AppRoutes.login;
-      }
-
-      // status == authenticated
-      final roleHome = switch (authProvider.currentUser?.role) {
-        'admin' => AppRoutes.adminHome,
-        'worker' => AppRoutes.workerHome,
-        _ => AppRoutes.customerHome,
-      };
-
-      final onCorrectRoleHome = loc.startsWith(roleHome);
-      if (isAuthRoute || loc == AppRoutes.splash || !onCorrectRoleHome) {
-        return roleHome;
-      }
-      return null;
-    },
-  );
-}
-
-/// Convenience widget that wires [AuthProvider] (already provided above
-/// it in the widget tree) into [buildRouter] via [MaterialApp.router].
-class AppRouterProvider extends StatelessWidget {
-  final ThemeData lightTheme;
-  final ThemeData darkTheme;
-  final ThemeMode themeMode;
-
-  const AppRouterProvider({
-    super.key,
-    required this.lightTheme,
-    required this.darkTheme,
-    required this.themeMode,
-  });
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    _sub = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
-    final router = buildRouter(authProvider);
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
 
-    return MaterialApp.router(
-      title: 'Length Factory',
-      debugShowCheckedModeBanner: false,
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: themeMode,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+/// Builds the app router once. The redirect enforces role-based access:
+/// unauthenticated users only see auth screens, authenticated users are
+/// always bounced to *their* role's shell.
+class AppRouter {
+  final AuthCubit authCubit;
+  late final GoRouter router;
+  late final GoRouterRefreshStream _refresh;
+
+  AppRouter(this.authCubit) {
+    _refresh = GoRouterRefreshStream(authCubit.stream);
+    router = GoRouter(
+      initialLocation: AppRoutes.splash,
+      refreshListenable: _refresh,
+      routes: [
+        GoRoute(path: AppRoutes.splash, builder: (_, __) => const SplashScreen()),
+        GoRoute(path: AppRoutes.login, builder: (_, __) => const LoginScreen()),
+        GoRoute(path: AppRoutes.register, builder: (_, __) => const RegisterScreen()),
+        GoRoute(path: AppRoutes.adminHome, builder: (_, __) => const AdminShell()),
+        GoRoute(path: AppRoutes.customerHome, builder: (_, __) => const CustomerShell()),
+        GoRoute(path: AppRoutes.workerHome, builder: (_, __) => const WorkerShell()),
       ],
-      routerConfig: router,
-      builder: (context, child) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: child!,
-      ),
+      redirect: (context, state) => redirectFor(authCubit.state, state.matchedLocation),
     );
+  }
+
+  /// Pure redirect logic (unit-testable).
+  static String? redirectFor(AuthState auth, String location) {
+    if (auth.status == AuthStatus.unknown) {
+      return location == AppRoutes.splash ? null : AppRoutes.splash;
+    }
+
+    final isAuthRoute = location == AppRoutes.login || location == AppRoutes.register;
+
+    if (auth.status == AuthStatus.unauthenticated) {
+      return isAuthRoute ? null : AppRoutes.login;
+    }
+
+    final user = auth.user!;
+    final home = user.isAdmin
+        ? AppRoutes.adminHome
+        : user.isWorker
+            ? AppRoutes.workerHome
+            : AppRoutes.customerHome;
+
+    if (!location.startsWith(home)) return home;
+    return null;
+  }
+
+  void dispose() {
+    _refresh.dispose();
+    router.dispose();
   }
 }
