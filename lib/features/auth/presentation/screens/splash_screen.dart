@@ -16,16 +16,7 @@ class SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 104,
-              height: 104,
-              decoration: BoxDecoration(
-                color: AppColors.primarySoft,
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.35), width: 1.5),
-              ),
-              child: const Icon(Icons.factory_rounded, color: AppColors.primary, size: 54),
-            ),
+            Image.asset('assets/images/app_icon.png', width: 112, height: 112),
             const SizedBox(height: 20),
             const Text(
               AppConstants.appName,

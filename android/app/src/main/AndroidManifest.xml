@@ -7,7 +7,7 @@
 
 
     <application
-        android:label="length_factory"
+        android:label="Length Factory"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
