@@ -1,417 +1,303 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white"/>
-<img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black"/>
-<img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white"/>
-<img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"/>
-<img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white"/>
-
-<br/>
-<br/>
-
-# 🏭 Length Factory
-
-### نظام إدارة مصنع وطلبات متكامل
-
-**Factory Management & Ordering System**
-
-*A production-ready Flutter application with role-based access control, real-time Firestore sync, and full Arabic RTL support.*
+<img src="docs/cover.png" alt="Length Factory" width="100%" />
 
 <br/>
 
-[![Made with Flutter](https://img.shields.io/badge/Made%20with-Flutter-blue?logo=flutter)](https://flutter.dev)
-[![Firebase](https://img.shields.io/badge/Backend-Firebase-orange?logo=firebase)](https://firebase.google.com)
-[![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-green)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-[![License](https://img.shields.io/badge/License-MIT-purple)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=flat-square&logo=dart&logoColor=white)](https://dart.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth%20·%20Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
+[![Platforms](https://img.shields.io/badge/Platforms-Android%20·%20Windows-3DDC84?style=flat-square)](#getting-started)
+[![License](https://img.shields.io/badge/License-MIT-8B5CF6?style=flat-square)](LICENSE)
+
+**Order and inventory management for a manufacturing business.**
+Admins run products, orders, customers and payments. Customers order from a live catalog.
+Workers see only the production queue, never a price.
+
+نظام إدارة مصنع وطلبات — واجهة عربية كاملة (RTL) لثلاثة أدوار: مدير، عميل، وعامل إنتاج.
+
+[Overview](#overview) · [Screenshots](#screenshots) · [Features](#features) · [Architecture](#architecture) · [Getting started](#getting-started)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## Overview
 
-- [About The Project](#-about-the-project)
-- [Features](#-features)
-- [User Roles](#-user-roles)
-- [Screenshots](#-screenshots)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
-- [Project Structure](#-project-structure)
-- [Database Schema](#-database-schema)
-- [Security Rules](#-security-rules)
-- [Getting Started](#-getting-started)
-- [Environment Setup](#-environment-setup)
-- [Roadmap](#-roadmap)
-- [Contributing](#-contributing)
+Length Factory replaces phone calls and paper order books with one app that everyone in the
+business uses. The same codebase runs on Android phones for customers and workers, and on
+Windows for the office.
 
----
+| Role | What they do in the app |
+|:--|:--|
+| **Admin** | Live dashboard, product catalog and stock, every order, customer balances and payments, staff accounts |
+| **Customer** | Browse the catalog, add to cart, check out on account, follow orders and see their balance |
+| **Worker** | A first-in, first-out production queue with start / finish actions and private notes. No prices, no balances |
 
-## 🌟 About The Project
+Every money or stock change (checkout, payment, cancellation, deletion) runs inside a single
+Firestore transaction, so a customer's balance and the stock count can never drift apart.
 
-**Length Factory** is a comprehensive factory management system built with Flutter and Firebase. It provides a complete solution for managing products, orders, customers, and workers in a manufacturing environment.
+## Screenshots
 
-The application supports **three distinct user roles**, each with a tailored interface and permissions:
+> Captured from the running app with sample data.
 
-- 🔴 **Admin** — Full control over products, orders, customers, and payments
-- 🟢 **Customer** — Browse products, place orders, and track payment history
-- 🟡 **Worker** — View production queue and mark orders as completed
+### Admin
 
-> Built with **Clean Architecture**, **Cubit (flutter_bloc)**, **GetIt**, **Dio**, **Material 3** (light, high-contrast theme), and full **Arabic RTL** support.
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/admin-dashboard.png" width="220" alt="Dashboard"/><br/><sub><b>Dashboard</b><br/>Sales, dues and quick stats</sub></td>
+    <td align="center"><img src="docs/screenshots/admin-dashboard-charts.png" width="220" alt="Charts"/><br/><sub><b>Charts</b><br/>7-day sales and order status</sub></td>
+    <td align="center"><img src="docs/screenshots/admin-products.png" width="220" alt="Products"/><br/><sub><b>Products</b><br/>Stock filters and low-stock badges</sub></td>
+    <td align="center"><img src="docs/screenshots/admin-orders.png" width="220" alt="Orders"/><br/><sub><b>Orders</b><br/>Search, status and payment filters</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/admin-order-details.png" width="220" alt="Order details"/><br/><sub><b>Order details</b><br/>Status flow, payment state, PDF invoice</sub></td>
+    <td align="center"><img src="docs/screenshots/admin-customers.png" width="220" alt="Customers"/><br/><sub><b>Customers</b><br/>Balances and one-tap payments</sub></td>
+    <td align="center"><img src="docs/screenshots/admin-customer-details.png" width="220" alt="Customer"/><br/><sub><b>Customer account</b><br/>Orders, payments, activate / suspend</sub></td>
+    <td align="center"><img src="docs/screenshots/admin-team.png" width="220" alt="Team"/><br/><sub><b>Team</b><br/>Create and disable staff accounts</sub></td>
+  </tr>
+</table>
 
----
+### Customer and worker
 
-## ✨ Features
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/customer-store.png" width="220" alt="Store"/><br/><sub><b>Store</b><br/>Live search and stock badges</sub></td>
+    <td align="center"><img src="docs/screenshots/customer-product.png" width="220" alt="Product"/><br/><sub><b>Product</b><br/>Quantity capped by available stock</sub></td>
+    <td align="center"><img src="docs/screenshots/customer-checkout.png" width="220" alt="Checkout"/><br/><sub><b>Checkout</b><br/>Balance before and after the order</sub></td>
+    <td align="center"><img src="docs/screenshots/customer-orders.png" width="220" alt="My orders"/><br/><sub><b>My orders</b><br/>Filter by status</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/customer-account.png" width="220" alt="Account"/><br/><sub><b>Account</b><br/>Balance and payment history</sub></td>
+    <td align="center"><img src="docs/screenshots/worker-queue.png" width="220" alt="Worker queue"/><br/><sub><b>Worker queue</b><br/>Start, finish, add a note, print</sub></td>
+    <td align="center"><img src="docs/screenshots/login.png" width="220" alt="Login"/><br/><sub><b>Sign in</b><br/>Role-based routing after login</sub></td>
+    <td></td>
+  </tr>
+</table>
 
-### 🔐 Authentication & Security
-- Firebase Authentication (Email/Password) + password reset
-- Role-based routing (automatic redirect based on user role)
-- Deactivated accounts are signed out immediately and cannot log in
-- Firestore Security Rules enforcing data access at the database level
-- Self-service Customer registration / Admin-created Worker & Admin accounts
+### Windows
 
-### 👨‍💼 Admin Panel
-- **Dashboard** — Live KPIs, today's / total sales, outstanding balances, 7-day sales bar chart, order-status pie chart, low-stock alerts, latest orders
-- **Products** — Add / edit / hide / restore, image upload to Cloudinary (via Dio), stock filters (available · low · out · hidden)
-- **Orders** — Search, status filter with counts, details page, status flow, payment status, delete, PDF invoice (print / share)
-- **Cancel = full reversal** — Cancelling or deleting an order removes its amount from the customer's balance and restores stock (atomic transaction)
-- **Customers** — Balance tracking, record payments, payment history, customer orders, activate / deactivate
-- **Team** — Create Worker / Admin accounts without logging the admin out, activate / deactivate staff
+<img src="docs/screenshots/desktop-dashboard.png" alt="Admin dashboard on Windows" width="100%"/>
 
-### 🛍️ Customer Panel
-- **Storefront** — Responsive product grid, live search, low-stock / out-of-stock badges
-- **Product Details** — Live stock & price, quantity selector capped by available stock
-- **Cart** — Quantity steppers, auto-synced with the live catalog (price / stock / hidden products)
-- **Checkout** — Balance before / after, optional order note, atomic order placement
-- **My Orders** — Status filter, details page, PDF invoice
-- **Account** — Live balance, edit name / phone, payment history
+## Features
 
-### 👷 Worker Panel
-- **Production Queue** — FIFO-sorted active orders (pending + preparing) with counters
-- **No financial data** — Prices and balances are never shown to workers
-- **Status Updates** — Start / finish with confirmation
-- **Private Notes** — Notes visible only to Admin; printable work order (no prices)
+**Authentication and access**
+- Email / password sign-in with password reset
+- Automatic routing to the Admin, Customer or Worker shell based on the user's role
+- Suspended accounts are signed out immediately and cannot sign back in
+- Customers register themselves; Admin and Worker accounts are created by an admin without logging the admin out
+- Firestore security rules enforce every permission at the database level, not only in the UI
 
----
+**Admin**
+- Dashboard: today's and total sales, outstanding dues, order counters, low-stock alerts, 7-day sales bar chart, order status pie chart
+- Products: add, edit, hide and restore; image upload to Cloudinary; filters for available, low, out of stock and hidden
+- Orders: search, status and payment filters with counts, status flow, payment status, delete, PDF invoice (print or share)
+- Cancelling or deleting an order reverses it completely: the amount leaves the customer's balance and the stock comes back, atomically
+- Customers: balances, record payments, payment history, order history, activate / deactivate
+- Team: create Worker or Admin accounts and switch them on or off
 
-## 👥 User Roles
+**Customer**
+- Responsive product grid with live search and stock badges
+- Product page with live price and stock; the quantity picker cannot exceed what is available
+- Cart that stays in sync with the catalog (price changes, stock, hidden products)
+- Checkout on account showing the balance before and after, with an optional note
+- Order list with status filter, order details and PDF invoice
+- Account page with live balance, editable name and phone, and payment history
+
+**Worker**
+- Production queue of pending and in-progress orders, oldest first, with counters
+- Start / finish with confirmation
+- Private notes that only the admin can read, and a printable work order without prices
+
+## Roles and permissions
 
 | Capability | Admin | Customer | Worker |
-|:-----------|:-----:|:--------:|:------:|
-| Manage Products | ✅ | ❌ | ❌ |
-| View Products | ✅ | ✅ | ✅ (name/qty only) |
-| Place Orders | ❌ | ✅ | ❌ |
-| View Orders | ✅ (all) | ✅ (own) | ✅ (active only) |
-| View Prices / Balances | ✅ | ✅ (own) | ❌ **never** |
-| Record Payments | ✅ | ❌ | ❌ |
-| Change Order Status | ✅ | ❌ | ✅ (start / finish) |
-| Cancel / Delete Orders | ✅ | ❌ | ❌ |
-| Worker Notes | 👁 read | ❌ | ✅ write |
-| Manage Customers & Staff | ✅ | ❌ | ❌ |
+|:--|:-:|:-:|:-:|
+| Manage products | ✅ | – | – |
+| View products | ✅ | ✅ | ✅ name and quantity only |
+| Place orders | – | ✅ | – |
+| View orders | ✅ all | ✅ own | ✅ active only |
+| See prices and balances | ✅ | ✅ own | never |
+| Record payments | ✅ | – | – |
+| Change order status | ✅ | – | ✅ start / finish |
+| Cancel or delete orders | ✅ | – | – |
+| Worker notes | read | – | write |
+| Manage customers and staff | ✅ | – | – |
 
----
+## Tech stack
 
-## 📱 Screenshots
+| Area | Choice |
+|:--|:--|
+| Framework | Flutter, Dart |
+| Architecture | Clean Architecture, feature-first (`data` / `domain` / `presentation`) |
+| State management | Cubit (`flutter_bloc`) |
+| Dependency injection | `get_it` |
+| Error handling | `dartz` `Either<Failure, T>` returned from every use case |
+| Backend | Firebase Authentication, Cloud Firestore |
+| Images | Cloudinary REST upload through `dio`, cached with `cached_network_image` |
+| Navigation | `go_router` with a role-based redirect driven by `AuthCubit` |
+| Charts | `fl_chart` |
+| Invoices | `pdf` + `printing` |
+| UI | Material 3, Cairo font (`google_fonts`), full RTL |
+| Tests | `flutter_test`, `bloc_test`, `mocktail`, `fake_cloud_firestore` |
 
-> *Screenshots will be added after first production deployment.*
+## Architecture
 
-| Admin Dashboard | Products Management | Order Management |
-|:-:|:-:|:-:|
-| ![Dashboard](docs/screenshots/admin_dashboard.png) | ![Products](docs/screenshots/admin_products.png) | ![Orders](docs/screenshots/admin_orders.png) |
-
-| Customer Storefront | Cart & Checkout | Worker Queue |
-|:-:|:-:|:-:|
-| ![Store](docs/screenshots/customer_store.png) | ![Cart](docs/screenshots/customer_cart.png) | ![Worker](docs/screenshots/worker_queue.png) |
-
----
-
-## 🛠 Tech Stack
-
-| Category | Technology |
-|:---------|:-----------|
-| **Framework** | Flutter 3.x (Stable) · Dart 3.x |
-| **Architecture** | Clean Architecture (feature-first: data / domain / presentation) |
-| **State Management** | Cubit — `flutter_bloc` |
-| **Dependency Injection** | `get_it` (service locator) |
-| **Error Handling** | `dartz` — `Either<Failure, T>` from every use case |
-| **Networking** | `dio` (Cloudinary REST image upload, interceptors, error mapping) |
-| **Backend** | Firebase Authentication · Cloud Firestore |
-| **Navigation** | `go_router` (role-based redirect, refreshed by `AuthCubit`) |
-| **UI** | Material 3 light theme + Google Fonts (Cairo), RTL |
-| **Charts** | `fl_chart` |
-| **Invoices** | `pdf` + `printing` |
-| **Testing** | `flutter_test`, `bloc_test`, `mocktail`, `fake_cloud_firestore` |
-
----
-
-## 🏗 Architecture
-
-Each feature is split into three layers. Dependencies only point inwards:
+Each feature is split into three layers, and dependencies only point inwards:
 **Presentation → Domain ← Data**.
 
 ```
 ┌──────────────────────────── PRESENTATION ────────────────────────────┐
-│  Screens / Widgets  ──►  Cubits (state)                              │
-│  e.g. OrdersCubit, CheckoutCubit, CartCubit, AuthCubit               │
+│  Screens / widgets  ──►  Cubits                                      │
+│  OrdersCubit, CheckoutCubit, CartCubit, AuthCubit, ...               │
 └──────────────────────────────────┬───────────────────────────────────┘
                                    │ calls
-┌──────────────────────────────── DOMAIN ─────────────────────────────┐
-│  Use cases  (PlaceOrderUseCase, RecordPaymentUseCase, ...)           │
-│  Entities   (UserEntity, ProductEntity, OrderEntity, ...)            │
-│  Repository contracts (abstract)        — pure Dart, no Firebase     │
+┌──────────────────────────────── DOMAIN ──────────────────────────────┐
+│  Use cases   PlaceOrderUseCase, RecordPaymentUseCase, ...            │
+│  Entities    UserEntity, ProductEntity, OrderEntity, ...             │
+│  Repository contracts (abstract)            pure Dart, no Firebase   │
 └──────────────────────────────────▲───────────────────────────────────┘
                                    │ implements
-┌───────────────────────────────── DATA ──────────────────────────────┐
-│  Repository implementations  (exceptions ➜ Either<Failure, T>)       │
-│  Remote data sources (Firestore transactions, FirebaseAuth)          │
-│  Models (toMap / fromMap) · Services (Dio Cloudinary, PDF invoice)   │
+┌───────────────────────────────── DATA ───────────────────────────────┐
+│  Repository implementations   exceptions ➜ Either<Failure, T>        │
+│  Remote data sources          Firestore transactions, FirebaseAuth   │
+│  Models (toMap / fromMap) · services (Cloudinary upload, PDF)        │
 └──────────────────────────────────────────────────────────────────────┘
-                 Wiring: GetIt  (lib/core/di/injection.dart)
+                    Wiring: GetIt  (lib/core/di/injection.dart)
 ```
 
-### Key Architecture Decisions
+Key decisions:
 
-- **Domain layer has no Firebase dependencies** — business rules (status flow, validation, dashboard math) are unit-tested without emulators
-- **Atomic transactions** for checkout, payments, cancellation and deletion — balance and stock can never drift
-- **Real-time everywhere** — Cubits subscribe to Firestore streams; the customer's balance updates live after checkout / payment
-- **Role-based routing** via `go_router` redirect driven by `AuthCubit` — users can never reach another role's screens
-- **Soft deletes** for products — historical orders remain accurate
-- **Screen-scoped Cubits** are GetIt factories (closed automatically by `BlocProvider`); `AuthCubit` and `CartCubit` are app-wide singletons
+- **The domain layer has no Firebase imports.** Status flow, validation and dashboard math are unit-tested without emulators.
+- **Atomic transactions** for checkout, payments, cancellation and deletion.
+- **Real-time everywhere.** Cubits listen to Firestore streams, so a customer's balance updates the moment an admin records a payment.
+- **Soft deletes for products**, so old orders keep showing the right name and price.
+- **Order items are snapshots** of the product at order time.
+- Screen-level Cubits are GetIt factories closed by `BlocProvider`; `AuthCubit` and `CartCubit` are app-wide singletons.
 
----
-
-## 📁 Project Structure
+<details>
+<summary><b>Project structure</b></summary>
 
 ```
 lib/
 ├── core/
-│   ├── constants/     # Collections, roles, statuses, Cloudinary config
-│   ├── cubit/         # SubmissionState, LoadStatus, SafeEmit mixin
-│   ├── di/            # GetIt registrations
-│   ├── errors/        # Exceptions, Failures, exception → failure mapper
-│   ├── network/       # Dio client + error mapping
-│   ├── routing/       # AppRouter (go_router) + role redirects
-│   ├── services/      # ImageUploadService (Cloudinary via Dio)
-│   ├── theme/         # AppColors, AppTheme (light, high contrast)
-│   ├── usecase/       # UseCase / StreamUseCase base classes
-│   ├── utils/         # Formatting, validators, stream helpers, UI helpers
-│   └── widgets/       # Shared widgets (buttons, badges, empty/error views...)
-│
+│   ├── constants/     collections, roles, statuses, Cloudinary config
+│   ├── cubit/         SubmissionState, LoadStatus, SafeEmit mixin
+│   ├── di/            GetIt registrations
+│   ├── errors/        exceptions, failures, exception → failure mapper
+│   ├── network/       Dio client and error mapping
+│   ├── routing/       AppRouter (go_router) and role redirects
+│   ├── services/      image upload (Cloudinary)
+│   ├── theme/         colors and theme
+│   ├── usecase/       UseCase / StreamUseCase base classes
+│   ├── utils/         formatting, validators, stream helpers
+│   └── widgets/       shared widgets
 ├── features/
-│   ├── auth/          # Session (AuthCubit), login / register / splash
-│   ├── products/      # Catalog, admin product management, storefront
-│   ├── cart/          # CartCubit + cart screen
-│   ├── orders/        # Checkout, order lists, details, worker queue, PDF invoice
-│   ├── accounts/      # Customers, payments, staff, customer profile
-│   ├── dashboard/     # DashboardStats + charts
-│   └── shell/         # Admin / Customer / Worker shells (bottom navigation)
-│
-│   (each feature)
-│   ├── data/          # datasources · models · repositories (impl)
-│   ├── domain/        # entities · repositories (contracts) · usecases
-│   └── presentation/  # cubit · screens · widgets
-│
-├── app.dart           # MaterialApp.router + global providers
+│   ├── auth/          session, login, register, splash
+│   ├── products/      catalog, admin product management, storefront
+│   ├── cart/          cart
+│   ├── orders/        checkout, order lists, details, worker queue, PDF invoice
+│   ├── accounts/      customers, payments, staff, customer profile
+│   ├── dashboard/     stats and charts
+│   └── shell/         Admin / Customer / Worker navigation shells
+├── app.dart
 ├── firebase_options.dart
-└── main.dart          # Firebase init + GetIt init
+└── main.dart
+```
+</details>
+
+<details>
+<summary><b>Firestore data model</b></summary>
+
+**`users/{uid}`**
+```json
+{ "name": "string", "phone": "string", "email": "string",
+  "role": "admin | customer | worker", "balance": 0.0,
+  "createdAt": "timestamp", "isActive": true }
 ```
 
----
-
-## 🗄 Database Schema
-
-### `users/{uid}`
+**`products/{id}`**
 ```json
-{
-  "name": "string",
-  "phone": "string",
-  "email": "string",
-  "role": "admin | customer | worker",
-  "balance": 0.0,
-  "createdAt": "timestamp",
-  "isActive": true
-}
+{ "name": "string", "nameLower": "string", "image": "string (URL)",
+  "price": 0.0, "description": "string", "quantity": 0,
+  "createdAt": "timestamp", "isActive": true }
 ```
 
-### `products/{id}`
+**`orders/{id}`**
 ```json
-{
-  "name": "string",
-  "nameLower": "string",
-  "image": "string (Storage URL)",
-  "price": 0.0,
-  "description": "string",
-  "quantity": 0,
-  "createdAt": "timestamp",
-  "isActive": true
-}
-```
-
-### `orders/{id}`
-```json
-{
-  "orderNumber": "string",
-  "customerId": "string (uid ref)",
-  "customerName": "string (snapshot)",
-  "phone": "string (snapshot)",
-  "items": [
-    {
-      "productId": "string",
-      "productName": "string (snapshot)",
-      "productImage": "string (snapshot)",
-      "unitPrice": 0.0,
-      "quantity": 0
-    }
-  ],
+{ "orderNumber": "string", "customerId": "uid", "customerName": "snapshot", "phone": "snapshot",
+  "items": [ { "productId": "string", "productName": "snapshot", "productImage": "snapshot",
+               "unitPrice": 0.0, "quantity": 0 } ],
   "totalPrice": 0.0,
   "status": "pending | preparing | completed | cancelled",
   "paymentStatus": "unpaid | partially_paid | paid",
-  "workerNote": "string (Admin-visible only)",
-  "createdAt": "timestamp",
-  "completedAt": "timestamp | null"
-}
+  "workerNote": "admin-visible only", "customerNote": "string | null",
+  "createdAt": "timestamp", "completedAt": "timestamp | null" }
 ```
 
-### `payments/{id}`
+**`payments/{id}`**
 ```json
-{
-  "customerId": "string (uid ref)",
-  "amount": 0.0,
-  "date": "timestamp",
-  "adminId": "string",
-  "adminName": "string",
-  "notes": "string | null"
-}
+{ "customerId": "uid", "amount": 0.0, "date": "timestamp",
+  "adminId": "string", "adminName": "string", "notes": "string | null" }
 ```
+</details>
 
-> **Note:** Order items store a **snapshot** of product data at order time. This ensures historical accuracy even if the product is later edited or deleted.
+<details>
+<summary><b>Security rules (highlights)</b></summary>
 
----
+| Rule | How |
+|:--|:--|
+| A customer can only create orders for themselves | `customerId == request.auth.uid` |
+| A customer cannot change their own role | `request.resource.data.role == resource.data.role` |
+| A worker can only update `status`, `completedAt`, `workerNote` | `affectedKeys().hasOnly([...])` |
+| A worker cannot read `payments` | no rule granted |
+| A customer can only decrease product `quantity` | `quantity < resource.data.quantity && quantity >= 0` |
+</details>
 
-## 🔒 Security Rules
+## Getting started
 
-Security is enforced at **two levels**:
-
-1. **UI level** — Workers never see price/balance widgets
-2. **Database level** — Firestore rules enforce access regardless of UI
-
-| Rule | Description |
-|:-----|:------------|
-| Customer can only `create` orders for themselves | `customerId == request.auth.uid` |
-| Customer cannot change their `role` | `request.resource.data.role == resource.data.role` |
-| Worker can only update `status`, `completedAt`, `workerNote` | `affectedKeys().hasOnly([...])` |
-| Worker cannot read `payments` collection | No rule granted |
-| Customer can only decrement product `quantity` | `quantity < resource.data.quantity && quantity >= 0` |
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Flutter SDK `>=3.24.0`
-- Dart SDK `>=3.3.0`
-- Android Studio / VS Code
-- Firebase project (Blaze plan recommended)
-- Node.js + Firebase CLI
-
-### Installation
+**Requirements:** Flutter 3.24+, a Firebase project, Node.js with the Firebase CLI.
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/osama-Yosef/length_factory.git
-cd length_factory
-
-# 2. Install dependencies
+git clone https://github.com/osama-Yosef/length-factory.git
+cd length-factory
 flutter pub get
 
-# 3. Connect Firebase (generates lib/firebase_options.dart)
+# Connect your Firebase project (generates lib/firebase_options.dart)
 dart pub global activate flutterfire_cli
 flutterfire configure
 
-# 4. Deploy Firestore rules & indexes
+# Deploy rules and indexes
 firebase deploy --only firestore:rules,firestore:indexes
 
-# 5. Run the app
-flutter run
+flutter run                 # Android
+flutter run -d windows      # Windows
 ```
 
----
+- **Images:** create an unsigned Cloudinary upload preset named `length_factory` and set your cloud name in `lib/core/constants/app_constants.dart`.
+- **First admin:** register from the app (this creates a customer), change `role` to `"admin"` on that user's document in Firestore, then sign in again.
+- **Windows build:** set `$env:CMAKE_POLICY_VERSION_MINIMUM="3.5"` before `flutter run -d windows`.
 
-## ⚙️ Environment Setup
+Run the tests with `flutter test`.
 
-### Firebase Services Required
+## Roadmap
 
-Enable the following in your Firebase Console:
+- [x] Clean Architecture foundation, Firebase, auth and role routing
+- [x] Admin panel: dashboard, products, orders, customers and payments
+- [x] Customer panel: store, cart, checkout, orders, account
+- [x] Worker panel: production queue, status updates, notes
+- [x] Staff management, full order reversal, charts, PDF invoices
+- [ ] Push notifications (FCM)
+- [ ] Excel customer reports and a QR code per order
+- [ ] Cloud Functions for server-side validation
 
-| Service | Purpose |
-|:--------|:--------|
-| **Authentication** | Email/Password sign-in |
-| **Cloud Firestore** | Real-time database |
+## Author
 
-Product images are uploaded to **Cloudinary** (free tier) through its REST API using Dio:
-create an **unsigned** upload preset named `length_factory`, then set your cloud name in
-`CloudinaryConfig.cloudName` (`lib/core/constants/app_constants.dart`).
+**Osama Yosef** · Flutter developer, Cairo
 
-Deploy the security rules and indexes after pulling:
+[![GitHub](https://img.shields.io/badge/GitHub-osama--Yosef-181717?style=flat-square&logo=github)](https://github.com/osama-Yosef)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Osama%20Yosef-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/osama-yosef-819268319)
+[![Upwork](https://img.shields.io/badge/Upwork-Hire%20me-6FDA44?style=flat-square&logo=upwork&logoColor=white)](https://upwork.com/freelancers/~014ebd205ef38ca04c)
+[![Email](https://img.shields.io/badge/Email-osamayosef038%40gmail.com-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:osamayosef038@gmail.com)
 
-```bash
-firebase deploy --only firestore:rules,firestore:indexes
-```
-
-### Creating the First Admin Account
-
-Self-registration only creates **Customer** accounts (by design).
-To create your first Admin:
-
-1. Register via the app (creates a Customer document)
-2. Open Firebase Console → Firestore → `users/{uid}`
-3. Change `role` field from `"customer"` to `"admin"`
-4. Log out and log back in — you'll be routed to the Admin Panel
-
-### Windows Desktop Build
-
-```powershell
-# Required environment variable for Firebase C++ SDK compatibility
-$env:CMAKE_POLICY_VERSION_MINIMUM="3.5"
-flutter run -d windows
-```
-
----
-
-## 🗺 Roadmap
-
-- [x] **Phase 1** — Foundation (Clean Architecture, Firebase setup, Auth flow, Role routing)
-- [x] **Phase 2** — Admin Panel (Dashboard, Products CRUD, Orders, Customers/Payments)
-- [x] **Phase 3** — Customer Panel (Storefront, Cart, Checkout, Orders, Profile)
-- [x] **Phase 4** — Worker Panel (Production Queue, Status Updates, Notes)
-- [x] **Phase 5** — Refactor to Cubit + GetIt + Dio, light high-contrast theme
-- [x] **Phase 6** — Staff management, order cancellation with reversal, dashboard charts, PDF invoices
-- [ ] **Phase 7** — Push Notifications (FCM for Android)
-- [ ] **Phase 8** — Excel customer reports, QR code per order
-- [ ] **Phase 9** — Cloud Functions (server-side transaction validation)
-
----
-
-## 👨‍💻 Author
-
-**Osama Yosef**
-
-[![GitHub](https://img.shields.io/badge/GitHub-osama--Yosef-181717?style=flat&logo=github)](https://github.com/osama-Yosef)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Osama%20Yosef-0A66C2?style=flat&logo=linkedin)](https://linkedin.com/in/osama-yosef-819268319)
-[![Upwork](https://img.shields.io/badge/Upwork-Osama%20Yosef-6FDA44?style=flat&logo=upwork)](https://upwork.com/freelancers/~014ebd205ef38ca04c)
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-<div align="center">
-
-**Built with ❤️ using Flutter & Firebase**
-
-*Length Factory — Professional Factory Management System*
-
-</div>
+Released under the [MIT License](LICENSE).
